@@ -43,10 +43,16 @@ DEFAULTS: dict = {
     "step": "idle",          # idle | waiting_approval | completed
     "interrupt_data": {},    # proposed_action, risk_level from interrupt()
     "final_state": {},
+    "_reset_query": False,   # flag để reset text_area trước khi render
 }
 for k, v in DEFAULTS.items():
     if k not in st.session_state:
         st.session_state[k] = v
+
+# Reset query_input TRƯỚC KHI widget được tạo
+if st.session_state._reset_query:
+    st.session_state.query_input = ""
+    st.session_state._reset_query = False
 
 DB_PATH = "outputs/streamlit_checkpoints.db"
 
@@ -251,8 +257,11 @@ with right:
             })
 
         if st.button("🔄 New query", use_container_width=True):
-            for k, v in DEFAULTS.items():
-                st.session_state[k] = v
+            st.session_state.step = "idle"
+            st.session_state.thread_id = None
+            st.session_state.final_state = {}
+            st.session_state.interrupt_data = {}
+            st.session_state._reset_query = True   # flag, không gán thẳng
             st.rerun()
 
 # ---------------------------------------------------------------------------
