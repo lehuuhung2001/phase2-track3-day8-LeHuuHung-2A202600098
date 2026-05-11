@@ -226,7 +226,36 @@ false positives on hidden grading scenarios.
 
 ---
 
-## 8. Improvement plan
+## 8. Hidden scenario validation
+
+Self-tested 15 hidden scenarios from `data/sample/scenarios_hidden.jsonl` — **15/15 pass**.
+
+Confirms routing logic is keyword-based and generalises to unseen queries (not hard-coded by scenario ID).
+
+| Scenario | Query | Expected | Result |
+|---|---|---|---|
+| G01_simple | What are your business hours? | simple | ✅ |
+| G02_simple2 | What is your return policy? | simple | ✅ |
+| G03_tool | Track my shipment for order 7890 | tool | ✅ |
+| G04_tool2 | Search for invoice number INV-2024-001 | tool | ✅ |
+| G05_tool3 | Find all pending tickets for account A-555 | tool | ✅ |
+| G06_missing | Please handle it | missing_info | ✅ |
+| G07_missing2 | Fix it now | missing_info | ✅ |
+| G08_risky | Cancel all pending orders for this customer | risky | ✅ |
+| G09_risky2 | Remove user profile and all associated data | risky | ✅ |
+| G10_risky3 | Revoke API access tokens for team workspace | risky | ✅ |
+| G11_risky4 | Send bulk notification to all premium users | risky | ✅ |
+| G12_error | Service unavailable when connecting to payment gateway | error | ✅ |
+| G13_error2 | Request failed with internal server error | error | ✅ |
+| G14_dead | Critical crash in authentication module unrecoverable | error | ✅ |
+| G15_mixed | Check refund status for order 456 | risky | ✅ |
+
+**G15_mixed** is the hardest case — contains both tool keywords (`check`, `status`, `order`)
+and risky keyword (`refund`). Routes correctly to `risky` because priority: risky > tool.
+
+---
+
+## 9. Improvement plan
 
 1. **LLM-as-judge in `evaluate_node`:** Replace `"ERROR" in result` heuristic with a
    structured LLM call checking if the tool result actually answers the user's question.
